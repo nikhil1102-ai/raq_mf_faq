@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mutual Fund FAQ Assistant</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#d9dff5",
+                    "on-primary-container": "#eeefff",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-variant": "#e1e3e4",
+                    "surface-bright": "#f8f9fa",
+                    "on-secondary-fixed-variant": "#404758",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e7e8e9",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "inverse-surface": "#2e3132",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d9dadb",
+                    "tertiary-fixed": "#d9e3f4",
+                    "on-tertiary-fixed-variant": "#3e4755",
+                    "on-surface-variant": "#434655",
+                    "surface-container-highest": "#e1e3e4",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "outline": "#737686",
+                    "on-secondary-fixed": "#141b2b",
+                    "on-tertiary-fixed": "#121c28",
+                    "on-surface": "#191c1d",
+                    "secondary-fixed": "#dce2f7",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#4c5664",
+                    "inverse-primary": "#b4c5ff",
+                    "background": "#f8f9fa",
+                    "surface-container": "#edeeef",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#646e7d",
+                    "secondary": "#575e70",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bdc7d8",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#00174b",
+                    "on-secondary-container": "#5c6274",
+                    "on-tertiary-container": "#e9f1ff",
+                    "outline-variant": "#c3c6d7",
+                    "primary": "#004ac6",
+                    "primary-container": "#2563eb",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#0053db",
+                    "on-background": "#191c1d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "48px",
+                    "container-padding-mobile": "20px",
+                    "gutter": "24px",
+                    "container-padding-desktop": "40px",
+                    "stack-md": "24px",
+                    "base": "8px",
+                    "stack-sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Inter", "sans-serif"],
+                    "label-md": ["Inter", "sans-serif"],
+                    "headline-lg": ["Inter", "sans-serif"],
+                    "headline-md": ["Inter", "sans-serif"],
+                    "caption-sm": ["Inter", "sans-serif"],
+                    "body-lg": ["Inter", "sans-serif"],
+                    "body-md": ["Inter", "sans-serif"],
+                    "headline-xl-mobile": ["Inter", "sans-serif"]
+            },
+            "fontSize": {
+                    "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                    "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                    "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "caption-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "headline-xl-mobile": ["30px", { "lineHeight": "38px", "fontWeight": "700" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-background h-screen overflow-hidden flex">
+<!-- Shared Component: SideNavBar (Hidden on Mobile, Flex on Desktop) -->
+<nav class="hidden md:flex flex-col h-full p-stack-md bg-surface-container border-r border-surface-variant w-64 shrink-0">
+<!-- Header -->
+<div class="text-headline-md font-headline-md font-bold text-primary mb-1">Scheme Directory</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant mb-stack-md">ICICI Pru &amp; Nippon India</div>
+<!-- Tabs -->
+<div class="flex flex-col gap-2 flex-1">
+<!-- Active Tab -->
+<a class="bg-secondary-container text-on-secondary-container rounded-lg font-bold flex items-center gap-3 p-3 hover:bg-surface-variant transition-colors scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="text-label-md font-label-md">Supported Schemes</span>
+</a>
+<!-- Inactive Tab -->
+<a class="text-on-surface-variant flex items-center gap-3 p-3 hover:bg-surface-variant rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-label-md font-label-md">Recent Chats</span>
+</a>
+<!-- Supported Schemes List (10 Items) -->
+<div class="mt-4 flex flex-col gap-2 overflow-y-auto pr-2 pb-4">
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">ICICI Prudential Flexicap Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">ICICI Prudential Bluechip Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">ICICI Prudential Liquid Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">ICICI Pru Value Discovery Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">ICICI Pru Balanced Advantage</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">Nippon India Tax Saver ELSS Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">Nippon India Small Cap Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">Nippon India Liquid Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">Nippon India Large Cap Fund</div>
+<div class="text-caption-sm font-caption-sm text-on-surface-variant px-3 py-1.5 hover:bg-surface-variant rounded-md cursor-pointer transition-colors">Nippon India Multi Cap Fund</div>
+</div>
+</div>
+<!-- CTA -->
+<button class="mt-auto bg-primary-container text-on-primary text-label-md font-label-md py-3 px-4 rounded-lg hover:opacity-90 transition-opacity">
+            View All Schemes
+        </button>
+</nav>
+<!-- Main Canvas Area -->
+<main class="flex-1 flex flex-col h-full relative overflow-hidden bg-surface-container-low">
+<!-- Shared Component: TopAppBar -->
+<header class="bg-surface-container-lowest border-b border-surface-variant flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop max-w-[1200px] mx-auto h-16 shrink-0 z-10">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Icon (Suppressed Nav logic allows drawer toggle) -->
+<button class="md:hidden text-on-surface-variant p-2 -ml-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-bold text-on-surface">Mutual Fund FAQ Assistant</h1>
+</div>
+<div class="hidden sm:flex text-label-md font-label-md text-primary bg-surface-container px-3 py-1.5 rounded-full items-center gap-2 border border-surface-variant">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+                Official sources only
+            </div>
+</header>
+<!-- Disclaimer Banner -->
+<div class="w-full bg-tertiary-fixed text-on-tertiary-fixed text-caption-sm font-caption-sm py-2 px-container-padding-mobile text-center border-b border-surface-variant shrink-0">
+<span class="font-bold">Disclaimer:</span> This assistant provides factual information based strictly on official scheme documents. It does not offer personalized investment advice.
+        </div>
+<!-- Scrollable Chat Canvas (Welcome State) -->
+<div class="flex-1 overflow-y-auto px-container-padding-mobile md:px-container-padding-desktop py-stack-lg flex flex-col items-center justify-center min-h-[500px]">
+<div class="w-full max-w-4xl flex flex-col items-center text-center">
+<!-- Assistant Avatar -->
+<div class="w-16 h-16 bg-primary-fixed text-on-primary-fixed rounded-2xl flex items-center justify-center mb-stack-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-primary-fixed-dim">
+<span class="material-symbols-outlined text-[32px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<!-- Welcome Headline & Supporting Text -->
+<h2 class="text-headline-xl-mobile md:text-headline-xl font-headline-xl-mobile md:font-headline-xl text-on-surface mb-stack-sm tracking-tight">How can I help?</h2>
+<p class="text-body-md md:text-body-lg font-body-md md:font-body-lg text-on-surface-variant mb-stack-lg max-w-2xl leading-relaxed">
+                    Ask me about expense ratio, exit load, minimum SIP, lock-in period, riskometer, benchmark, or statement-related procedures.
+                </p>
+<!-- Example Questions Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter w-full">
+<!-- Card 1 -->
+<button class="flex flex-col text-left bg-surface-container-lowest border border-surface-variant rounded-xl p-6 hover:border-primary hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all group cursor-pointer h-full justify-between items-start">
+<span class="material-symbols-outlined text-primary mb-4 bg-primary-fixed/30 p-2 rounded-lg group-hover:scale-110 transition-transform">analytics</span>
+<span class="text-body-md font-body-md text-on-surface group-hover:text-primary transition-colors leading-snug">What is the expense ratio of ICICI Prudential Flexicap Fund?</span>
+</button>
+<!-- Card 2 -->
+<button class="flex flex-col text-left bg-surface-container-lowest border border-surface-variant rounded-xl p-6 hover:border-primary hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all group cursor-pointer h-full justify-between items-start">
+<span class="material-symbols-outlined text-primary mb-4 bg-primary-fixed/30 p-2 rounded-lg group-hover:scale-110 transition-transform">lock_clock</span>
+<span class="text-body-md font-body-md text-on-surface group-hover:text-primary transition-colors leading-snug">What is the lock-in period for Nippon India Tax Saver ELSS Fund?</span>
+</button>
+<!-- Card 3 -->
+<button class="flex flex-col text-left bg-surface-container-lowest border border-surface-variant rounded-xl p-6 hover:border-primary hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all group cursor-pointer h-full justify-between items-start">
+<span class="material-symbols-outlined text-primary mb-4 bg-primary-fixed/30 p-2 rounded-lg group-hover:scale-110 transition-transform">description</span>
+<span class="text-body-md font-body-md text-on-surface group-hover:text-primary transition-colors leading-snug">How can I download my capital-gains statement?</span>
+</button>
+</div>
+<!-- Mobile Only: Supported Schemes Reveal Button -->
+<button class="mt-stack-lg md:hidden bg-surface-container-lowest text-primary text-label-md font-label-md py-3 px-6 rounded-full border border-surface-variant flex items-center gap-2 hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">list_alt</span> View 10 Supported Schemes
+                </button>
+</div>
+</div>
+<!-- Input Area Docked -->
+<div class="w-full shrink-0 bg-surface-container-low px-container-padding-mobile md:px-container-padding-desktop flex flex-col items-center pb-2 pt-4 border-t border-surface-variant/50">
+<div class="w-full max-w-4xl relative">
+<!-- Chat Input -->
+<input class="w-full h-[56px] bg-surface-container-lowest border border-surface-variant rounded-xl pl-4 pr-14 text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-[0_2px_12px_rgba(0,0,0,0.03)] transition-all" placeholder="Message FAQ Assistant..." type="text"/>
+<!-- Send Button -->
+<button class="absolute right-2 top-2 bottom-2 w-10 h-10 bg-primary-container text-on-primary rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
+</button>
+</div>
+<!-- Shared Component: Footer -->
+<footer class="w-full py-4 flex flex-col items-center gap-2 bg-surface-container-low z-10 max-w-4xl">
+<p class="text-caption-sm font-caption-sm text-on-surface-variant text-center max-w-2xl px-4">
+                    Facts-only. No investment advice. Answers are based only on approved official public sources.
+                </p>
+<div class="flex gap-6 mt-1">
+<a class="text-caption-sm font-caption-sm text-primary underline hover:text-primary/80 transition-colors opacity-70 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-caption-sm font-caption-sm text-primary underline hover:text-primary/80 transition-colors opacity-70 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-caption-sm font-caption-sm text-primary underline hover:text-primary/80 transition-colors opacity-70 hover:opacity-100" href="#">Source Directory</a>
+</div>
+</footer>
+</div>
+</main>
+</body></html>
