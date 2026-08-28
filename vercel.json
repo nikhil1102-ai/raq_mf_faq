@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "installCommand": null,
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
   "outputDirectory": "ui",
   "rewrites": [
     {
