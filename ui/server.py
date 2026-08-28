@@ -62,15 +62,12 @@ def auto_ingest_if_empty():
 
 # --- CORS Middleware ---
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+logging.info(f"CORS: FRONTEND_URL={FRONTEND_URL}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        FRONTEND_URL,
-        "http://localhost:3000",
-        "http://localhost:8000",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
