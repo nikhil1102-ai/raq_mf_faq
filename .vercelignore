@@ -1,0 +1,26 @@
+# Backend & pipeline (deployed on Railway, not Vercel)
+ui/server.py
+pipeline/
+retrieval/
+ingestion/
+chroma_store/
+data/
+tests/
+
+# Config & environment
+.env
+.env.example
+.venv/
+__pycache__/
+*.pyc
+
+# Railway config
+Procfile
+railway.toml
+railpack.json
+runtime.txt
+requirements.txt
+
+# Dev files
+test_re.py
+modify_html.py
