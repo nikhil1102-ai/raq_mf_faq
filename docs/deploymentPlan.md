@@ -55,34 +55,18 @@ graph LR
 
 ## 1. Backend Deployment — Railway
 
-Railway will host the FastAPI backend, the RAG pipeline, ChromaDB storage, and serve the `/api/ask` endpoint.
+Railway will host the FastAPI backend, the RAG pipeline, ChromaDB storage, and serve the `/api/ask` e### 1.1 — Project Preparation
 
-### 1.1 — Project Preparation
+#### Create `railpack.json` (Project Root)
 
-#### Create `Procfile` (Project Root)
+Railway now uses the Railpack builder. We need to tell it how to start the FastAPI server:
 
-```
-web: uvicorn ui.server:app --host 0.0.0.0 --port $PORT
-```
-
-#### Create `runtime.txt` (Project Root)
-
-```
-python-3.11.9
-```
-
-#### Create `railway.toml` (Project Root)
-
-```toml
-[build]
-builder = "nixpacks"
-
-[deploy]
-startCommand = "uvicorn ui.server:app --host 0.0.0.0 --port $PORT"
-healthcheckPath = "/"
-healthcheckTimeout = 300
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+```json
+{
+  "deploy": {
+    "startCommand": "uvicorn ui.server:app --host 0.0.0.0 --port ${PORT:-8000}"
+  }
+}
 ```
 
 #### Update `requirements.txt`
@@ -105,11 +89,13 @@ uvicorn[standard]
 > [!IMPORTANT]
 > Remove `streamlit` from `requirements.txt` for the Railway deployment if it's not needed — it adds unnecessary build time and memory usage.
 
-#### Update `ui/server.py` — Add CORS Middleware
+#### Update `ui/server.py` — Add CORS Middleware and Endpoints
 
-Since the frontend (Vercel) and backend (Railway) will be on different domains, CORS must be enabled:
+Since the frontend (Vercel) and backend (Railway) will be on different domains, CORS must be enabled. We also added a health check and an `/api/ingest/trigger` endpoint:
 
 ```python
+import threading
+from fastapi import Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # After app = FastAPI()
@@ -124,6 +110,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ... (health check and ask endpoints) ...
+
+# --- Ingestion Trigger Endpoint ---
+_ingest_running = False
+
+@app.post("/api/ingest/trigger")
+def trigger_ingest(authorization: str = Header(default=None)):
+    # ... (auth logic) ...
+    # Runs the ingestion pipeline inside the app process
+    pass
 ```
 
 > [!WARNING]
@@ -143,35 +140,25 @@ app.add_middleware(
    | `COLLECTION_NAME` | `mf_faq_corpus` | ChromaDB collection name |
    | `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence-transformer model |
    | `TOP_K` | `5` | Number of retrieval results |
-   | `PORT` | `8000` | Railway injects this automatically |
    | `FRONTEND_URL` | `https://<your-project>.vercel.app` | For CORS allowlist |
+   | `INGEST_API_KEY` | (Optional) Random string | Protects the `/api/ingest/trigger` endpoint |
 
-5. **Set the start command** (if not auto-detected from `Procfile`):
-   ```
-   uvicorn ui.server:app --host 0.0.0.0 --port $PORT
-   ```
+5. **Deploy** → Railway will build the Docker image, install dependencies, and start the server.
 
-6. **Deploy** → Railway will build the Docker image, install dependencies, and start the server.
-
-7. **Generate a public domain:**
+6. **Generate a public domain:**
    - Settings → Networking → "Generate Domain"
    - Note the URL: `https://<project>.up.railway.app`
 
 ### 1.3 — Initial Data Seeding on Railway
 
-After the first deployment, ChromaDB will be empty. Run the ingestion pipeline once:
+After the first deployment, ChromaDB will be empty. Run the ingestion pipeline once via the new endpoint:
 
-**Option A — Railway CLI:**
 ```bash
-railway run python ingestion/ingest.py --mode daily
+curl -X POST https://<project>.up.railway.app/api/ingest/trigger -H "Authorization: Bearer <your_INGEST_API_KEY>"
 ```
 
-**Option B — Railway Shell (Dashboard):**
-- Go to your Railway service → "Shell" tab
-- Run: `python ingestion/ingest.py --mode daily`
-
 > [!IMPORTANT]
-> The first ingestion must complete before the `/api/ask` endpoint will return meaningful results. This may take 2–5 minutes.
+> The first ingestion must complete before the `/api/ask` endpoint will return meaningful results. This may take 2–5 minutes. Check Railway logs for progress.
 
 ### 1.4 — Persistent Storage (ChromaDB)
 
@@ -209,7 +196,9 @@ Vercel needs a clear static site or framework structure. Since the frontend is p
 ```json
 {
   "version": 2,
-  "buildCommand": null,
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
   "outputDirectory": "ui",
   "rewrites": [
     {
@@ -231,22 +220,37 @@ Vercel needs a clear static site or framework structure. Since the frontend is p
 ```
 
 > [!IMPORTANT]
-> Replace `<project>.up.railway.app` with your actual Railway deployment URL from Step 1.
+> The `"framework": null` line is crucial to prevent Vercel from trying to deploy this as a FastAPI Python backend. Replace `<project>.up.railway.app` with your actual Railway deployment URL.
+
+#### Create `.vercelignore` (Project Root)
+
+Tell Vercel to ignore backend files:
+
+```
+# Backend & pipeline
+ui/server.py
+pipeline/
+retrieval/
+ingestion/
+chroma_store/
+data/
+tests/
+
+# Config & environment
+.env
+.env.example
+.venv/
+__pycache__/
+*.pyc
+
+# Railway config
+railpack.json
+requirements.txt
+```
 
 #### Update API Base URL in `ui/static/app.js`
 
 The frontend JS currently calls `/api/ask` (relative path). With Vercel rewrites, this will automatically proxy to Railway, so **no code change is needed** — the relative `/api/ask` path will work via the rewrite rule.
-
-However, if you prefer an explicit configuration, add an environment-aware base URL:
-
-```javascript
-const API_BASE = window.location.hostname === 'localhost' 
-    ? 'http://localhost:8000' 
-    : '';  // Empty = same origin, proxied via Vercel rewrites
-
-// In sendMessage():
-const res = await fetch(`${API_BASE}/api/ask`, { ... });
-```
 
 ### 2.2 — Vercel Deployment Steps
 
@@ -255,18 +259,11 @@ const res = await fetch(`${API_BASE}/api/ask`, { ... });
 3. **Framework Preset:** Select **"Other"** (since this is a static HTML site)
 4. **Root Directory:** Leave as `/` (project root)
 5. **Build & Output Settings:**
-   - Build Command: *leave empty* (no build step needed)
+   - Build Command: *leave empty*
    - Output Directory: `ui`
    - Install Command: *leave empty*
-
-6. **Environment Variables** (optional — only if using explicit API_BASE):
-
-   | Variable | Value |
-   |----------|-------|
-   | `NEXT_PUBLIC_API_URL` | `https://<project>.up.railway.app` |
-
+6. **Environment Variables:** **Leave completely empty.** Vercel does not need any backend environment variables for this static site.
 7. **Deploy** → Vercel will deploy the static files from `ui/`.
-
 8. **Note the deployment URL:** `https://<project>.vercel.app`
 
 ### 2.3 — Post-Deploy: Update CORS on Railway
