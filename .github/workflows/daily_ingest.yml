@@ -1,0 +1,31 @@
+name: Daily Corpus Refresh
+on:
+  schedule:
+    - cron: "0 10 * * *"   # 10:00 UTC daily
+  workflow_dispatch:        # Manual trigger from GitHub UI
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: chroma_store/
+          key: chroma-store-${{ github.run_id }}
+          restore-keys: chroma-store-
+      - run: python ingestion/ingest.py --mode daily
+        env: { GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }} }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chroma-store-${{ github.run_number }}
+          path: chroma_store/
+          retention-days: 7
+      - if: failure()
+        run: echo "::error::Daily ingestion failed — ChromaDB may be stale!"

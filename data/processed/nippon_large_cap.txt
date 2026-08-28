@@ -1,31 +1,19 @@
 [Scheme: Nippon India Large Cap Fund – Direct Growth | AMC: Nippon India | Category: Large Cap | Source: https://groww.in/mutual-funds/nippon-india-large-cap-fund-direct-growth]
 
-Exit load : Exit load of 1% if redeemed within 7 days. : Stamp duty on investment: : 0.005% (from July 1st, 2020) : from July 1st 2020 : Tax implication : If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%. : Check past data
+Key Fund Details:
+NAV: 26 Aug '26: ₹101.67
+Fund Size (AUM): ₹54,224.57 Cr
+Expense Ratio: 0.88%
+Minimum SIP: ₹100
+Groww Rating: 5 stars
+Risk Level: Very High Risk
+Benchmark: BSE 100 Total Return Index
+Fund Manager: Amber Singhania
 
-A fee payable to a mutual fund house for managing your mutual fund investments.     It is the total percentage of a company's fund assets used for administrative, management, advertising, and other expenses.
+Exit Load, Stamp Duty & Tax:
+Exit Load: Exit load of 1% if redeemed within 7 days.
+Stamp Duty: 0.005% (from July 1st, 2020)
+Tax Implication: If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%.
 
-A form of tax payable for the purchase or sale of an asset or security.
-
-NAV: 26 Aug '26 : ₹101.67 : Min. for SIP : ₹100 : Fund size (AUM) : ₹54,224.57 Cr : Expense ratio : 0.88% : Rating : 5
-
-Mutual Fund Houses : Know about AMCs, funds, fund managers
-
-Name : 1Y : 3Y : Fund Size(Cr)
-
-A percentage of your capital gains payable to the government upon exiting your mutual fund investments.     Taxation is categorized as long-term capital gains (LTCG) and short-term capital gains (STCG) depending on your holding period and the type of fund.
-
-Exit Load : 22 May 2020 : Exit load of 1% if redeemed within 7 days. : 11 Jun 2018 : For more than 10% of investments 1% will be charged if redeemed within 1 year : 20 Apr 2015 : Exit load of 1% if redeemed within 1 year : 05 Dec 2014 : Exit load of 1% if redeemed within 18 months : 01 Jan 2013 : Exit load of 1% if redeemed within 1 year
-
-Mutual Funds screener : Filter funds based on risk, fund size and more
-
-22 May 2020 : Exit load of 1% if redeemed within 7 days. : 11 Jun 2018 : For more than 10% of investments 1% will be charged if redeemed within 1 year : 20 Apr 2015 : Exit load of 1% if redeemed within 1 year : 05 Dec 2014 : Exit load of 1% if redeemed within 18 months : 01 Jan 2013 : Exit load of 1% if redeemed within 1 year
-
-A fee payable to a mutual fund house for exiting a fund (fully or partially) before the completion of a specified period from the date of investment.
-
-Min. for SIP : ₹100
-
-Average of the yearly returns of a mutual fund over a given period.
-
-Fund benchmark : BSE 100 Total Return Index : Scheme Information Document(SID)
-
-The total return of a mutual fund over a given period.
+Fund Description:
+Nippon India Large Cap Fund Direct Growth Nippon India Large Cap Fund Direct Growth is a Equity Mutual Fund Scheme launched by Nippon India Mutual Fund. This scheme was made available to investors on 30 Jun 1995. Amber Singhania is the Current Fund Manager of Nippon India Large Cap Fund Direct Growth fund. The fund currently has an Asset Under Management(AUM) of ₹7,78,923 Cr and the Latest NAV as of 26 Aug 2026 is ₹101.67. The Nippon India Large Cap Fund Direct Growth is rated Very High risk. Minimum SIP Investment is set to ₹100. Minimum Lumpsum Investment is ₹100. Exit load of 1% if redeemed within 7 days. ; Investment Objective The scheme seeks to generate long term capital appreciation by investing predominantly into equity and equity related instruments of large cap companies. Fund benchmark BSE 100 Total Return Index

@@ -1,31 +1,19 @@
 [Scheme: ICICI Prudential Multicap Fund – Direct Growth | AMC: ICICI Prudential | Category: Multi Cap | Source: https://groww.in/mutual-funds/icici-prudential-multicap-fund-direct-growth]
 
-06 Apr 2026 : Exit load of 1%, if redeemed within 1 month. : 24 Aug 2018 : Exit load of 1% if redeemed within 12 months : 10 Jul 2015 : Exit load of 1% if redeemed within 18 months : 01 Jan 2013 : Exit load of 1% if redeemed upto 1 year
+Key Fund Details:
+NAV: 26 Aug '26: ₹991.42
+Fund Size (AUM): ₹18,769.03 Cr
+Expense Ratio: 1.03%
+Minimum SIP: ₹100
+Groww Rating: 4 stars
+Risk Level: Very High Risk
+Benchmark: Nifty 500 Multicap 50:25:25 Total Return Index
+Fund Manager: Sharmila D'Silva
 
-A fee payable to a mutual fund house for managing your mutual fund investments.     It is the total percentage of a company's fund assets used for administrative, management, advertising, and other expenses.
+Exit Load, Stamp Duty & Tax:
+Exit Load: Exit load of 1%, if redeemed within 1 month.
+Stamp Duty: 0.005% (from July 1st, 2020)
+Tax Implication: If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%.
 
-A form of tax payable for the purchase or sale of an asset or security.
-
-Exit load : Exit load of 1%, if redeemed within 1 month. : Stamp duty on investment: : 0.005% (from July 1st, 2020) : from July 1st 2020 : Tax implication : If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%. : Check past data
-
-Name : 1Y : 3Y : Fund Size(Cr)
-
-Mutual Fund Houses : Know about AMCs, funds, fund managers
-
-Fund benchmark : Nifty 500 Multicap 50:25:25 Total Return Index : Scheme Information Document(SID)
-
-Mutual Funds screener : Filter funds based on risk, fund size and more
-
-A percentage of your capital gains payable to the government upon exiting your mutual fund investments.     Taxation is categorized as long-term capital gains (LTCG) and short-term capital gains (STCG) depending on your holding period and the type of fund.
-
-A fee payable to a mutual fund house for exiting a fund (fully or partially) before the completion of a specified period from the date of investment.
-
-Min. for SIP : ₹100
-
-NAV: 26 Aug '26 : ₹991.42 : Min. for SIP : ₹100 : Fund size (AUM) : ₹18,769.03 Cr : Expense ratio : 1.03% : Rating : 4
-
-Average of the yearly returns of a mutual fund over a given period.
-
-The total return of a mutual fund over a given period.
-
-Exit Load : 06 Apr 2026 : Exit load of 1%, if redeemed within 1 month. : 24 Aug 2018 : Exit load of 1% if redeemed within 12 months : 10 Jul 2015 : Exit load of 1% if redeemed within 18 months : 01 Jan 2013 : Exit load of 1% if redeemed upto 1 year
+Fund Description:
+ICICI Prudential Multi Cap Fund Direct Growth ICICI Prudential Multi Cap Fund Direct Growth is a Equity Mutual Fund Scheme launched by ICICI Prudential Mutual Fund. This scheme was made available to investors on 12 Oct 1993. Sharmila D'Silva is the Current Fund Manager of ICICI Prudential Multi Cap Fund Direct Growth fund. The fund currently has an Asset Under Management(AUM) of ₹11,56,100 Cr and the Latest NAV as of 26 Aug 2026 is ₹991.42. The ICICI Prudential Multi Cap Fund Direct Growth is rated Very High risk. Minimum SIP Investment is set to ₹100. Minimum Lumpsum Investment is ₹5,000. Exit load of 1%, if redeemed within 1 month. ; Investment Objective The scheme seeks to generate capital appreciation through investments in equity & equity related instrument across large cap, mid cap and small cap stocks of various industries. Fund benchmark Nifty 500 Multicap 50:25:25 Total Return Index

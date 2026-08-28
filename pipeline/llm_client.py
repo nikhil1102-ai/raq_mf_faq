@@ -22,15 +22,22 @@ def _get_client() -> groq.Groq:
 def generate(messages: list[dict]) -> str:
     client = _get_client()
     try:
-        response = client.chat.completions.create(
-            model="qwen-qwq-32b",
-            messages=messages,
-            temperature=0.1,
-            max_tokens=256,
-            top_p=0.9
-        )
-        answer = response.choices[0].message.content.strip()
-        logging.info(f"LLM response received ({len(answer)} chars)")
-        return answer
+        # Retry up to 2 times if the model returns empty content
+        for attempt in range(2):
+            response = client.chat.completions.create(
+                model="qwen/qwen3.8-27b",
+                messages=messages,
+                temperature=0.1,
+                max_tokens=512,
+                top_p=0.9
+            )
+            answer = response.choices[0].message.content.strip()
+            logging.info(f"LLM response received ({len(answer)} chars) [attempt {attempt + 1}]")
+            if answer:
+                return answer
+            logging.warning(f"LLM returned empty response on attempt {attempt + 1}, retrying...")
+        # If still empty after retries, return a safe fallback
+        logging.error("LLM returned empty response after all retries.")
+        return "I don't have that information in my current data. Please visit the official AMC website."
     except Exception as e:
         raise LLMError(f"Groq API call failed: {e}") from e

@@ -22,7 +22,7 @@ def retrieve(query_vector: list[float], k: int = None) -> list[dict]:
     distances = results.get("distances", [[]])[0]
 
     for doc, meta, dist in zip(documents, metadatas, distances):
-        if dist < 0.8:
+        if dist < 1.5:
             chunks.append({
                 "text": doc,
                 "source_url": meta.get("source_url", ""),
@@ -31,7 +31,7 @@ def retrieve(query_vector: list[float], k: int = None) -> list[dict]:
                 "distance": dist
             })
         else:
-            logging.info(f"Discarding chunk with distance {dist:.3f} (above threshold 0.8)")
+            logging.info(f"Discarding chunk with distance {dist:.3f} (above threshold 1.5)")
 
     logging.info(f"Retrieved {len(chunks)} relevant chunks (k={k})")
     return chunks

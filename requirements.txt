@@ -7,3 +7,5 @@ chromadb
 groq
 streamlit
 python-dotenv
+fastapi
+uvicorn[standard]

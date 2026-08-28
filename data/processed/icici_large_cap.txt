@@ -1,31 +1,19 @@
 [Scheme: ICICI Prudential Large Cap Fund – Direct Growth | AMC: ICICI Prudential | Category: Large Cap | Source: https://groww.in/mutual-funds/icici-prudential-large-cap-fund-direct-growth]
 
-Exit Load : 06 Apr 2026 : Exit load of 1%, if redeemed within 1 month. : 01 Jan 2013 : Exit load of 1% if redeemed upto 1 year.
+Key Fund Details:
+NAV: 26 Aug '26: ₹120.79
+Fund Size (AUM): ₹80,960.34 Cr
+Expense Ratio: 1.00%
+Minimum SIP: ₹100
+Groww Rating: 5 stars
+Risk Level: Very High Risk
+Benchmark: NIFTY 100 Total Return Index
+Fund Manager: Sharmila D'Silva
 
-06 Apr 2026 : Exit load of 1%, if redeemed within 1 month. : 01 Jan 2013 : Exit load of 1% if redeemed upto 1 year.
+Exit Load, Stamp Duty & Tax:
+Exit Load: Exit load of 1%, if redeemed within 1 month.
+Stamp Duty: 0.005% (from July 1st, 2020)
+Tax Implication: If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%.
 
-Fund benchmark : NIFTY 100 Total Return Index : Scheme Information Document(SID)
-
-A fee payable to a mutual fund house for managing your mutual fund investments.     It is the total percentage of a company's fund assets used for administrative, management, advertising, and other expenses.
-
-A form of tax payable for the purchase or sale of an asset or security.
-
-Exit load : Exit load of 1%, if redeemed within 1 month. : Stamp duty on investment: : 0.005% (from July 1st, 2020) : from July 1st 2020 : Tax implication : If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%. : Check past data
-
-Name : 1Y : 3Y : Fund Size(Cr)
-
-NAV: 26 Aug '26 : ₹120.79 : Min. for SIP : ₹100 : Fund size (AUM) : ₹80,960.34 Cr : Expense ratio : 1.00% : Rating : 5
-
-Mutual Fund Houses : Know about AMCs, funds, fund managers
-
-Mutual Funds screener : Filter funds based on risk, fund size and more
-
-A percentage of your capital gains payable to the government upon exiting your mutual fund investments.     Taxation is categorized as long-term capital gains (LTCG) and short-term capital gains (STCG) depending on your holding period and the type of fund.
-
-A fee payable to a mutual fund house for exiting a fund (fully or partially) before the completion of a specified period from the date of investment.
-
-Min. for SIP : ₹100
-
-Average of the yearly returns of a mutual fund over a given period.
-
-The total return of a mutual fund over a given period.
+Fund Description:
+ICICI Prudential Large Cap Fund Direct Growth ICICI Prudential Large Cap Fund Direct Growth is a Equity Mutual Fund Scheme launched by ICICI Prudential Mutual Fund. This scheme was made available to investors on 12 Oct 1993. Sharmila D'Silva is the Current Fund Manager of ICICI Prudential Large Cap Fund Direct Growth fund. The fund currently has an Asset Under Management(AUM) of ₹11,56,100 Cr and the Latest NAV as of 26 Aug 2026 is ₹120.79. The ICICI Prudential Large Cap Fund Direct Growth is rated Very High risk. Minimum SIP Investment is set to ₹100. Minimum Lumpsum Investment is ₹100. Exit load of 1%, if redeemed within 1 month. ; Investment Objective The scheme seeks to generate long term capital appreciation and income distribution to investors from a portfolio that is predominantly invested in equity and equity related securities of large cap companies. Fund benchmark NIFTY 100 Total Return Index

@@ -16,7 +16,7 @@ def format_response(raw_answer: str, chunks: list[dict]) -> dict:
         logging.info("Source line was missing from LLM response; appended from metadata.")
 
     # Extract just the answer portion (before the Source line for clean display)
-    answer_match = re.split(r"\n\nSource:", answer)
+    answer_match = re.split(r"\n*\s*Source:", answer, flags=re.IGNORECASE)
     answer_text = answer_match[0].strip() if len(answer_match) > 1 else answer
 
     return {

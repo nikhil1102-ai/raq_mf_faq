@@ -1,29 +1,20 @@
 [Scheme: Nippon India Tax Saver ELSS Fund – Direct Growth | AMC: Nippon India | Category: ELSS | Source: https://groww.in/mutual-funds/nippon-india-elss-tax-saver-fund-direct-growth]
 
-Min. for SIP : ₹500
+Key Fund Details:
+NAV: 26 Aug '26: ₹145.13
+Fund Size (AUM): ₹14,909.88 Cr
+Expense Ratio: 1.11%
+Minimum SIP: ₹500
+Groww Rating: 4 stars
+Risk Level: Very High Risk
+Benchmark: NIFTY 500 Total Return Index
+Lock-in Period: 3Y Lock-in
+Fund Manager: Ritesh Rathod
 
-Exit load : Nil : Stamp duty on investment: : 0.005% (from July 1st, 2020) : from July 1st 2020 : Tax implication : If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%. : Check past data
+Exit Load, Stamp Duty & Tax:
+Exit Load: Nil
+Stamp Duty: 0.005% (from July 1st, 2020)
+Tax Implication: If you redeem within one year, returns are taxed at 20%. If you redeem after one year, returns exceeding Rs 1.25 lakh in a financial year are taxed at 12.5%.
 
-A fee payable to a mutual fund house for managing your mutual fund investments.     It is the total percentage of a company's fund assets used for administrative, management, advertising, and other expenses.
-
-A form of tax payable for the purchase or sale of an asset or security.
-
-Exit Load : 01 Jan 2013 : --
-
-Name : 1Y : 3Y : Fund Size(Cr)
-
-Fund benchmark : NIFTY 500 Total Return Index : Scheme Information Document(SID)
-
-Mutual Fund Houses : Know about AMCs, funds, fund managers
-
-Mutual Funds screener : Filter funds based on risk, fund size and more
-
-A percentage of your capital gains payable to the government upon exiting your mutual fund investments.     Taxation is categorized as long-term capital gains (LTCG) and short-term capital gains (STCG) depending on your holding period and the type of fund.
-
-A fee payable to a mutual fund house for exiting a fund (fully or partially) before the completion of a specified period from the date of investment.
-
-Average of the yearly returns of a mutual fund over a given period.
-
-NAV: 26 Aug '26 : ₹145.13 : Min. for SIP : ₹500 : Fund size (AUM) : ₹14,909.88 Cr : Expense ratio : 1.11% : Rating : 4
-
-The total return of a mutual fund over a given period.
+Fund Description:
+Nippon India ELSS Tax Saver Fund Direct Growth Nippon India ELSS Tax Saver Fund Direct Growth is a Equity Mutual Fund Scheme launched by Nippon India Mutual Fund. This scheme was made available to investors on 30 Jun 1995. Ritesh Rathod is the Current Fund Manager of Nippon India ELSS Tax Saver Fund Direct Growth fund. The fund currently has an Asset Under Management(AUM) of ₹7,78,923 Cr and the Latest NAV as of 26 Aug 2026 is ₹145.13. The Nippon India ELSS Tax Saver Fund Direct Growth is rated Very High risk. Minimum SIP Investment is set to ₹500. Minimum Lumpsum Investment is ₹500. ; Investment Objective The scheme aims to generate long-term capital appreciation from a portfolio that is invested predominantly in equity and equity related instruments. Fund benchmark NIFTY 500 Total Return Index
