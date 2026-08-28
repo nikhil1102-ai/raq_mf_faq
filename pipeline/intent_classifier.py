@@ -23,6 +23,6 @@ def refusal_response() -> str:
     return (
         "I can only provide factual information about mutual fund schemes.\n"
         "For investment guidance, please consult a SEBI-registered advisor or\n"
-        "visit AMFI's investor education portal: https://www.amfiindia.com/investor-corner/knowledge-center\n\n"
+        "visit AMFI's investor education portal: https://www.amfiindia.com/investor\n\n"
         "Facts-only. No investment advice."
     )
