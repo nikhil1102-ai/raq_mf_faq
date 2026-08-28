@@ -19,6 +19,47 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 app = FastAPI()
 
+
+# --- Auto-Ingest on Startup ---
+@app.on_event("startup")
+def auto_ingest_if_empty():
+    """Check if ChromaDB is empty on startup and auto-ingest from processed files."""
+    try:
+        from retrieval.chroma_client import get_collection
+        collection = get_collection()
+        doc_count = collection.count()
+        logging.info(f"ChromaDB collection has {doc_count} documents.")
+
+        if doc_count == 0:
+            logging.info("ChromaDB is empty — starting auto-ingestion in background thread...")
+
+            def _startup_ingest():
+                global _ingest_running
+                _ingest_running = True
+                try:
+                    from ingestion.ingest import main as ingest_main
+                    original_argv = sys.argv
+                    sys.argv = ["ingest.py", "--mode", "full", "--source", "processed"]
+                    try:
+                        ingest_main()
+                    finally:
+                        sys.argv = original_argv
+                    logging.info("Auto-ingestion completed successfully.")
+                except Exception as e:
+                    logging.error(f"Auto-ingestion failed: {e}")
+                    logging.error(traceback.format_exc())
+                finally:
+                    _ingest_running = False
+
+            thread = threading.Thread(target=_startup_ingest, daemon=True)
+            thread.start()
+        else:
+            logging.info("ChromaDB already has data — skipping auto-ingestion.")
+    except Exception as e:
+        logging.error(f"Auto-ingest check failed: {e}")
+        logging.error(traceback.format_exc())
+
+
 # --- CORS Middleware ---
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
