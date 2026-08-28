@@ -21,11 +21,12 @@ jobs:
           key: chroma-store-${{ github.run_id }}
           restore-keys: chroma-store-
       - run: python ingestion/ingest.py --mode daily
-        env: { GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }} }
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       - uses: actions/upload-artifact@v4
         with:
           name: chroma-store-${{ github.run_number }}
           path: chroma_store/
           retention-days: 7
       - if: failure()
-        run: echo "::error::Daily ingestion failed — ChromaDB may be stale!"
+        run: echo "::error::Daily ingestion failed - ChromaDB may be stale!"
