@@ -2,8 +2,10 @@ import sys
 import os
 import logging
 import traceback
+import threading
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -16,6 +18,21 @@ from pipeline.qa_pipeline import answer
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
+
+# --- CORS Middleware ---
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        FRONTEND_URL,
+        "http://localhost:3000",
+        "http://localhost:8000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Resolve paths relative to the project root, not the CWD
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +50,12 @@ class Query(BaseModel):
 @app.get("/")
 def root():
     return FileResponse(INDEX_HTML)
+
+
+@app.get("/api/health")
+def health():
+    """Health check endpoint for Railway."""
+    return {"status": "ok"}
 
 
 @app.post("/api/ask")
@@ -59,3 +82,52 @@ def ask(q: Query):
                 "message": "An internal error occurred while processing your request. Please try again."
             }
         )
+
+
+# --- Ingestion Trigger Endpoint ---
+# Runs the ingestion pipeline inside the app process (packages are available here)
+_ingest_lock = threading.Lock()
+_ingest_running = False
+
+
+@app.post("/api/ingest/trigger")
+def trigger_ingest(authorization: str = Header(default=None)):
+    """Trigger the ingestion pipeline. Protected by INGEST_API_KEY."""
+    global _ingest_running
+
+    # Auth check
+    expected_key = os.getenv("INGEST_API_KEY")
+    if expected_key:
+        if not authorization or authorization != f"Bearer {expected_key}":
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if _ingest_running:
+        return JSONResponse(
+            status_code=409,
+            content={"status": "already_running", "message": "Ingestion is already in progress."}
+        )
+
+    def run_ingest():
+        global _ingest_running
+        _ingest_running = True
+        try:
+            from ingestion.ingest import main as ingest_main
+            # Monkey-patch sys.argv so argparse doesn't fail
+            original_argv = sys.argv
+            sys.argv = ["ingest.py", "--mode", "daily", "--source", "processed"]
+            try:
+                ingest_main()
+            finally:
+                sys.argv = original_argv
+            logging.info("Ingestion completed successfully.")
+        except Exception as e:
+            logging.error(f"Ingestion failed: {e}")
+            logging.error(traceback.format_exc())
+        finally:
+            _ingest_running = False
+
+    thread = threading.Thread(target=run_ingest, daemon=True)
+    thread.start()
+
+    return {"status": "started", "message": "Ingestion pipeline started in the background."}
+
