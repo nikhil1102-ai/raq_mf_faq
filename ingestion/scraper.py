@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 import logging
@@ -20,6 +21,7 @@ def scrape(url: str, slug: str) -> str:
             response.raise_for_status()
             html = response.text
             
+            os.makedirs("data/raw", exist_ok=True)
             with open(f"data/raw/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(html)
             return html
