@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # IMPORT UPDATED HERE
-from pipeline.intent_classifier import classify, refusal_response, personal_data_response
+from pipeline.intent_classifier import classify, refusal_response, personal_data_response, statement_response
 from retrieval.query_embedder import embed_query
 from retrieval.retriever import retrieve
 from pipeline.prompt_builder import build_prompt
@@ -38,6 +38,15 @@ def answer(query: str) -> dict:
         return {
             "type": "advisory", # Keeping type as advisory so the UI correctly shows the warning bubble
             "message": personal_data_response()
+        }
+
+    # NEW BLOCK FOR STATEMENT QUERIES
+    if intent == "STATEMENT":
+        elapsed = time.time() - start_time
+        logging.info(f"Query processed in {elapsed:.2f}s (Statement)")
+        return {
+            "type": "advisory", # Keeping type as advisory so the UI correctly shows the warning bubble
+            "message": statement_response()
         }
         
     # 2. Query Embedding

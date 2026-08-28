@@ -14,7 +14,11 @@ PERSONAL_PATTERNS = [
     "pan", "aadhar", "folio", "portfolio", "my investment", "my account"
 ]
 
-def classify(query: str) -> Literal["FACTUAL", "ADVISORY", "PERSONAL"]:
+STATEMENT_PATTERNS = [
+    "capital gains statement", "download statement", "account statement", "tax statement"
+]
+
+def classify(query: str) -> Literal["FACTUAL", "ADVISORY", "PERSONAL", "STATEMENT"]:
     query_lower = query.lower()
     
     # Check for personal data intent first
@@ -22,6 +26,12 @@ def classify(query: str) -> Literal["FACTUAL", "ADVISORY", "PERSONAL"]:
         if pattern in query_lower:
             logging.info(f"Query classified as PERSONAL (matched: '{pattern}')")
             return "PERSONAL"
+
+    # Check for statement intent
+    for pattern in STATEMENT_PATTERNS:
+        if pattern in query_lower:
+            logging.info(f"Query classified as STATEMENT (matched: '{pattern}')")
+            return "STATEMENT"
             
     # Then check for advisory intent
     for pattern in ADVISORY_PATTERNS:
@@ -44,3 +54,6 @@ def personal_data_response() -> str:
 	   "I don't have access to personal investment or portfolio data linked to your PAN/Aadhar or folio number.\n"
 	   "To check your holdings, please visit your registrar's portal or the official AMC website."
 	)
+
+def statement_response() -> str:
+    return "I can't access your personal account, but your capital gains statement is usually available under the \"Reports\" or \"Statements\" section of your investment platform (AMC, registrar, or broker app)."
