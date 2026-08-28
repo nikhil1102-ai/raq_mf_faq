@@ -162,11 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.value = '';
 
         try {
-            const res = await fetch('/api/ask', {
+            const API_BASE = 'https://mutualfund-faq-assistant-production.up.railway.app';
+            const res = await fetch(`${API_BASE}/api/ask`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: query.trim() })
             });
+
             const data = await res.json();
 
             if (data.type === 'factual' || data.answer) {

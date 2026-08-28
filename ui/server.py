@@ -80,8 +80,15 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(PROJECT_ROOT, "ui", "static")
 INDEX_HTML = os.path.join(PROJECT_ROOT, "ui", "index.html")
 
-# Mount static files
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+logging.info(f"PROJECT_ROOT: {PROJECT_ROOT}")
+logging.info(f"STATIC_DIR exists: {os.path.isdir(STATIC_DIR)} ({STATIC_DIR})")
+logging.info(f"INDEX_HTML exists: {os.path.isfile(INDEX_HTML)} ({INDEX_HTML})")
+
+# Mount static files (only if directory exists)
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+else:
+    logging.warning(f"Static directory not found: {STATIC_DIR} — skipping static mount")
 
 
 class Query(BaseModel):
@@ -90,7 +97,10 @@ class Query(BaseModel):
 
 @app.get("/")
 def root():
-    return FileResponse(INDEX_HTML)
+    if os.path.isfile(INDEX_HTML):
+        return FileResponse(INDEX_HTML)
+    return {"status": "ok", "message": "Backend is running. Frontend served via Vercel."}
+
 
 
 @app.get("/api/health")
