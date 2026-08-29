@@ -157,8 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function sendMessage(query) {
         if (!query.trim()) return;
 
-        setState('LOADING');
         appendUserBubble(query);
+        setState('LOADING');
         chatInput.value = '';
 
         try {
