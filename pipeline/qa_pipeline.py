@@ -78,10 +78,15 @@ def answer(query: str) -> dict:
         }
         
     # 2. Query Embedding
+    t0 = time.time()
     query_vector = embed_query(query)
+    t1 = time.time()
+    logging.info(f"  [TIMING] embed_query: {t1 - t0:.2f}s")
     
     # 3. Retrieval
     chunks = retrieve(query_vector)
+    t2 = time.time()
+    logging.info(f"  [TIMING] retrieve: {t2 - t1:.2f}s")
     
     if not chunks:
         elapsed = time.time() - start_time
@@ -96,12 +101,18 @@ def answer(query: str) -> dict:
         
     # 4. Prompt Building
     messages = build_prompt(query, chunks)
+    t3 = time.time()
+    logging.info(f"  [TIMING] build_prompt: {t3 - t2:.2f}s")
     
     # 5. LLM Generation
     raw_answer = generate(messages)
+    t4 = time.time()
+    logging.info(f"  [TIMING] llm_generate: {t4 - t3:.2f}s")
     
     # 6. Response Formatting
     final_response = format_response(raw_answer, chunks)
+    t5 = time.time()
+    logging.info(f"  [TIMING] format_response: {t5 - t4:.2f}s")
 
     # Cache the result for repeated queries
     _set_cache(query, final_response)

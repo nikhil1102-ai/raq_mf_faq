@@ -79,17 +79,6 @@ def auto_ingest_if_empty():
         logging.error(traceback.format_exc())
 
 
-# --- CORS Middleware ---
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-logging.info(f"CORS: FRONTEND_URL={FRONTEND_URL}")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Resolve paths relative to the project root, not the CWD
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
