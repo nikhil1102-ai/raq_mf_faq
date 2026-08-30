@@ -5,7 +5,7 @@ Document Created : 30-Aug-2026
 Environment      : FastAPI backend on Railway (Free Tier) + Vercel frontend
 Original Latency : 12–16 seconds per user query
 Target Latency   : < 5 seconds per user query
-Achieved Latency : ~3 seconds per user query
+Achieved Latency : ~1.5 seconds per user query (milliseconds for cached queries)
 ================================================================================
 
 
@@ -19,9 +19,10 @@ TABLE OF CONTENTS
 6. Fix #5 – Ping / Keep-Alive Endpoint
 7. Fix #6 – Ingestion Source Fix (Stale Data)
 8. Fix #7 – Code Cleanup (Duplicate Exception Blocks)
-9. Files Modified
-10. Verification Steps
-11. Recommendations for Further Improvement
+9. Fix #8 – Jina AI Embeddings (Removing CPU Bottleneck)
+10. Files Modified
+11. Verification Steps
+12. Recommendations for Further Improvement
 
 
 ================================================================================
@@ -273,7 +274,37 @@ ISSUES FIXED:
 
 
 ================================================================================
-9. FILES MODIFIED
+9. FIX #8 – JINA AI EMBEDDINGS (REMOVING CPU BOTTLENECK)
+================================================================================
+
+File    : retrieval/query_embedder.py, ingestion/embedder.py
+Impact  : Reduced query embedding latency from ~13s to ~0.3s
+Cause   : Running SentenceTransformer locally on Railway's free-tier CPU
+          was severely CPU-bound (took ~13s per query).
+
+BEFORE:
+  model = SentenceTransformer("all-MiniLM-L6-v2")
+  embedding = model.encode(query)
+
+AFTER:
+  # Call Jina AI API directly
+  response = requests.post(
+      "https://api.jina.ai/v1/embeddings",
+      headers={"Authorization": f"Bearer {key}"},
+      json={"model": "jina-embeddings-v2-base-en", "input": [query]}
+  )
+
+WHY IT WORKS:
+  - Offloads the computationally expensive neural network inference (embedding)
+    from Railway's weak CPU to Jina AI's GPU servers.
+  - Achieves API response times of ~300-500ms instead of 13 seconds.
+  - Allowed us to remove heavy ML dependencies (sentence-transformers)
+    from requirements.txt, significantly speeding up builds and reducing image size.
+  - Required one-time re-ingestion since the model changed (384-dim -> 768-dim).
+
+
+================================================================================
+10. FILES MODIFIED
 ================================================================================
 
   File                              Changes
@@ -283,7 +314,8 @@ ISSUES FIXED:
                                     ingestion source fix (web),
                                     removed duplicate except blocks,
                                     moved imports to top,
-                                    restored app = FastAPI()
+                                    restored app = FastAPI(),
+                                    added ?clear=true parameter to trigger
 
   pipeline/llm_client.py            Model: gpt-oss-20b,
                                     temperature: 0.1, max_tokens: 512,
@@ -291,12 +323,17 @@ ISSUES FIXED:
 
   pipeline/qa_pipeline.py           In-memory LRU cache with 1hr TTL
 
+  retrieval/query_embedder.py       Switched from local SentenceTransformer
+  ingestion/embedder.py             to Jina AI Embedding API
+
+  requirements.txt                  Removed heavy ML dependencies
+
   .github/workflows/daily_ingest.yml  Railway API trigger for daily
                                       ingestion with fresh web data
 
 
 ================================================================================
-10. VERIFICATION STEPS
+11. VERIFICATION STEPS
 ================================================================================
 
   Step 1: Start the server locally
@@ -328,7 +365,7 @@ ISSUES FIXED:
 
 
 ================================================================================
-11. RECOMMENDATIONS FOR FURTHER IMPROVEMENT
+12. RECOMMENDATIONS FOR FURTHER IMPROVEMENT
 ================================================================================
 
   Priority  Recommendation                         Expected Impact
