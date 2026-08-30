@@ -13,7 +13,7 @@ from ingestion.scraper import scrape
 from ingestion.parser import parse
 from ingestion.chunker import chunk
 from ingestion.embedder import embed
-from retrieval.chroma_client import get_collection
+from retrieval.chroma_client import get_collection, get_chroma_client
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -33,18 +33,19 @@ def main():
 
     collection = get_collection()
 
-    # Clear collection if requested
+    # Clear collection if requested — delete and recreate to handle dimension changes
     if args.clear:
-        existing_count = collection.count()
-        if existing_count > 0:
-            logging.info(f"Clearing {existing_count} existing documents from collection.")
-            # ChromaDB: delete all by getting all IDs
-            all_ids = collection.get()["ids"]
-            if all_ids:
-                collection.delete(ids=all_ids)
-            logging.info("Collection cleared.")
-        else:
-            logging.info("Collection is already empty.")
+        client = get_chroma_client()
+        collection_name = os.getenv("COLLECTION_NAME", "mf_faq_corpus")
+        try:
+            existing_count = collection.count()
+            logging.info(f"Deleting collection '{collection_name}' ({existing_count} documents)...")
+            client.delete_collection(name=collection_name)
+            logging.info("Collection deleted. Recreating fresh...")
+        except Exception:
+            logging.info("No existing collection to delete.")
+        collection = client.get_or_create_collection(name=collection_name)
+        logging.info("Fresh collection created.")
 
     total_chunks = 0
     failures = []
