@@ -156,7 +156,7 @@ _ingest_running = False
 
 
 @app.post("/api/ingest/trigger")
-def trigger_ingest(authorization: str = Header(default=None)):
+def trigger_ingest(authorization: str = Header(default=None), clear: bool = False):
     """Trigger the ingestion pipeline. Protected by INGEST_API_KEY."""
     global _ingest_running
 
@@ -181,7 +181,7 @@ def trigger_ingest(authorization: str = Header(default=None)):
             from ingestion.ingest import main as ingest_main
             # Monkey-patch sys.argv so argparse doesn't fail
             original_argv = sys.argv
-            sys.argv = ["ingest.py", "--mode", "daily", "--source", "web"]
+            sys.argv = ["ingest.py", "--mode", "daily", "--source", "web"] + (["--clear"] if clear else [])
             try:
                 ingest_main()
             finally:
