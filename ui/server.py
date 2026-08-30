@@ -79,6 +79,16 @@ def auto_ingest_if_empty():
         logging.error(traceback.format_exc())
 
 
+@app.on_event("startup")
+def warm_up_embedding_model():
+    """Pre-load the embedding model so the first query doesn't pay the loading cost."""
+    try:
+        from retrieval.query_embedder import warm_up
+        warm_up()
+    except Exception as e:
+        logging.warning(f"Embedding model warm-up failed: {e}")
+
+
 
 # Resolve paths relative to the project root, not the CWD
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
