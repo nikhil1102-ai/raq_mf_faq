@@ -1,47 +1,47 @@
 import os
 import logging
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-_model = None
+# ---------------------------------------------------------------------------
+# Jina AI Embedding API — Query Embedding
+# ---------------------------------------------------------------------------
+# Uses the same Jina model as the ingestion embedder to ensure consistency.
+# Returns embeddings in ~0.3s vs 13s+ with local SentenceTransformer.
+# ---------------------------------------------------------------------------
+
+JINA_API_URL = "https://api.jina.ai/v1/embeddings"
+JINA_MODEL = "jina-embeddings-v2-base-en"
 
 
-def _get_model():
-    """
-    Load the embedding model once (singleton).
-    Tries ONNX backend first (2-5x faster on CPU), falls back to PyTorch.
-    """
-    global _model
-    if _model is not None:
-        return _model
-
-    model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
-    logging.info(f"Loading embedding model: {model_name}")
-
-    from sentence_transformers import SentenceTransformer
-
-    # Try ONNX backend first — significantly faster on CPU
-    try:
-        _model = SentenceTransformer(model_name, backend="onnx")
-        logging.info(f"Loaded '{model_name}' with ONNX backend (fast CPU inference)")
-        return _model
-    except Exception as e:
-        logging.warning(f"ONNX backend unavailable ({e}), trying PyTorch backend")
-
-    # Fallback to default PyTorch backend
-    _model = SentenceTransformer(model_name)
-    logging.info(f"Loaded '{model_name}' with PyTorch backend")
-    return _model
-
-
-def warm_up():
-    """Pre-load the model so the first user query doesn't pay the loading cost."""
-    _get_model()
-    logging.info("Embedding model warmed up and ready.")
+def _get_jina_key() -> str:
+    key = os.getenv("JINA_API_KEY", "")
+    if not key:
+        raise ValueError("JINA_API_KEY environment variable is not set")
+    return key
 
 
 def embed_query(query: str) -> list[float]:
-    model = _get_model()
-    embedding = model.encode(query)
-    return embedding.tolist()
+    """Embed a single query string using Jina AI API."""
+    key = _get_jina_key()
+
+    response = requests.post(
+        JINA_API_URL,
+        headers={
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": JINA_MODEL,
+            "input": [query],
+        },
+        timeout=15,
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    embedding = data["data"][0]["embedding"]
+    logging.info(f"Embedded query via Jina API ({len(embedding)} dims)")
+    return embedding
