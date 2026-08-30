@@ -25,11 +25,10 @@ def generate(messages: list[dict]) -> str:
         # Retry up to 2 times if the model returns empty content
         for attempt in range(2):
             response = client.chat.completions.create(
-                model="qwen/qwen3.8-27b",
+                model="openai/gpt-oss-20b",   # or "openai/gpt-oss-120b" for higher quality
                 messages=messages,
                 temperature=0.1,
                 max_tokens=512,
-                top_p=0.9
             )
             answer = response.choices[0].message.content.strip()
             logging.info(f"LLM response received ({len(answer)} chars) [attempt {attempt + 1}]")

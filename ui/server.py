@@ -39,7 +39,7 @@ def auto_ingest_if_empty():
                 try:
                     from ingestion.ingest import main as ingest_main
                     original_argv = sys.argv
-                    sys.argv = ["ingest.py", "--mode", "full", "--source", "processed"]
+                    sys.argv = ["ingest.py", "--mode", "full", "--source", "web"]
                     try:
                         ingest_main()
                     finally:
@@ -164,7 +164,7 @@ def trigger_ingest(authorization: str = Header(default=None)):
             from ingestion.ingest import main as ingest_main
             # Monkey-patch sys.argv so argparse doesn't fail
             original_argv = sys.argv
-            sys.argv = ["ingest.py", "--mode", "daily", "--source", "processed"]
+            sys.argv = ["ingest.py", "--mode", "daily", "--source", "web"]
             try:
                 ingest_main()
             finally:
