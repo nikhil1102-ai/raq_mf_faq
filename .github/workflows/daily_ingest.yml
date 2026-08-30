@@ -1,32 +1,73 @@
-name: Daily Corpus Refresh
+name: Daily Corpus Refresh (Option B — Railway Trigger)
+
 on:
   schedule:
-    - cron: "0 10 * * *"   # 10:00 UTC daily
+    - cron: "0 10 * * *"   # 10:00 UTC daily (3:30 PM IST)
   workflow_dispatch:        # Manual trigger from GitHub UI
+
 jobs:
-  ingest:
+  trigger-ingest:
+    name: Trigger ingestion on Railway
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-      - run: pip install -r requirements.txt
-      - uses: actions/cache@v4
-        with:
-          path: chroma_store/
-          key: chroma-store-${{ github.run_id }}
-          restore-keys: chroma-store-
-      - run: python ingestion/ingest.py --mode daily
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: chroma-store-${{ github.run_number }}
-          path: chroma_store/
-          retention-days: 7
-      - if: failure()
-        run: echo "::error::Daily ingestion failed - ChromaDB may be stale!"
+      # ── Step 1: Wake up Railway (in case it cold-started) ─────────────────
+      - name: Health check — warm up Railway
+        run: |
+          echo "Pinging Railway health endpoint..."
+          for i in 1 2 3; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RAILWAY_URL }}/api/health")
+            echo "Attempt $i — HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then break; fi
+            sleep 10
+          done
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::Railway health check failed after 3 attempts (HTTP $STATUS)"
+            exit 1
+          fi
+
+      # ── Step 2: Trigger the ingestion endpoint ───────────────────────────
+      - name: Trigger /api/ingest/trigger on Railway
+        id: trigger
+        run: |
+          echo "Triggering ingestion pipeline..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.INGEST_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.RAILWAY_URL }}/api/ingest/trigger")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response body: $BODY"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Ingestion triggered successfully."
+          elif [ "$HTTP_CODE" = "409" ]; then
+            echo "⚠️ Ingestion already running — skipping."
+          else
+            echo "::error::Unexpected response: HTTP $HTTP_CODE — $BODY"
+            exit 1
+          fi
+
+      # ── Step 3: Poll health endpoint to confirm ingestion completes ───────
+      # The trigger is async (returns immediately). Poll for up to 10 min.
+      - name: Wait for ingestion to complete
+        run: |
+          echo "Waiting for ingestion to finish (polling every 30s, up to 10 min)..."
+          for i in $(seq 1 20); do
+            sleep 30
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RAILWAY_URL }}/api/health")
+            echo "Poll $i/20 — Railway HTTP $STATUS"
+            if [ "$STATUS" != "200" ]; then
+              echo "::warning::Railway became unreachable during poll $i (HTTP $STATUS) — may be restarting."
+            fi
+          done
+          echo "✅ Polling complete. Check Railway logs to confirm ingestion finished."
+
+      # ── Step 4: Report failure ─────────────────────────────────────────────
+      - name: Report failure
+        if: failure()
+        run: echo "::error::Daily ingestion workflow failed — ChromaDB may be stale! Check Railway logs."

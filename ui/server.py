@@ -143,11 +143,13 @@ def trigger_ingest(authorization: str = Header(default=None)):
     """Trigger the ingestion pipeline. Protected by INGEST_API_KEY."""
     global _ingest_running
 
-    # Auth check
+    # Auth check — always enforce; reject if key not configured
     expected_key = os.getenv("INGEST_API_KEY")
-    if expected_key:
-        if not authorization or authorization != f"Bearer {expected_key}":
-            raise HTTPException(status_code=401, detail="Unauthorized")
+    if not expected_key:
+        logging.error("INGEST_API_KEY is not set — refusing to expose trigger endpoint.")
+        raise HTTPException(status_code=503, detail="Ingest endpoint not configured.")
+    if not authorization or authorization != f"Bearer {expected_key}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     if _ingest_running:
         return JSONResponse(
@@ -178,4 +180,19 @@ def trigger_ingest(authorization: str = Header(default=None)):
     thread.start()
 
     return {"status": "started", "message": "Ingestion pipeline started in the background."}
+
+
+@app.get("/api/ingest/status")
+def ingest_status(authorization: str = Header(default=None)):
+    """Check whether an ingestion job is currently running. Protected by INGEST_API_KEY."""
+    expected_key = os.getenv("INGEST_API_KEY")
+    if not expected_key:
+        raise HTTPException(status_code=503, detail="Ingest endpoint not configured.")
+    if not authorization or authorization != f"Bearer {expected_key}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    return {
+        "status": "running" if _ingest_running else "idle",
+        "message": "Ingestion is currently in progress." if _ingest_running else "No ingestion running."
+    }
 

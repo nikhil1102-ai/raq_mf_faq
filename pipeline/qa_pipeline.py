@@ -16,9 +16,37 @@ from pipeline.response_formatter import format_response
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# --- Simple query-level cache ---
+# Stores (result, timestamp) keyed by normalized query string.
+# FAQ bots receive many repeated questions — this bypasses embed+retrieve+LLM entirely.
+_cache: dict = {}
+_CACHE_TTL = 3600  # seconds (1 hour)
+_CACHE_MAX = 128
+
+def _get_cached(query: str):
+    key = " ".join(query.lower().split())
+    entry = _cache.get(key)
+    if entry and (time.time() - entry["ts"]) < _CACHE_TTL:
+        return entry["result"]
+    return None
+
+def _set_cache(query: str, result: dict):
+    key = " ".join(query.lower().split())
+    if len(_cache) >= _CACHE_MAX:
+        # Evict the oldest entry
+        oldest = min(_cache, key=lambda k: _cache[k]["ts"])
+        del _cache[oldest]
+    _cache[key] = {"result": result, "ts": time.time()}
+
 def answer(query: str) -> dict:
     start_time = time.time()
     logging.info(f"Processing query: '{query}'")
+
+    # Cache check — skip for advisory/personal (non-deterministic intent not needed)
+    cached = _get_cached(query)
+    if cached is not None:
+        logging.info(f"Cache HIT for query: '{query}'")
+        return cached
     
     # 1. Intent Classification
     intent = classify(query)
@@ -74,10 +102,13 @@ def answer(query: str) -> dict:
     
     # 6. Response Formatting
     final_response = format_response(raw_answer, chunks)
-    
+
+    # Cache the result for repeated queries
+    _set_cache(query, final_response)
+
     elapsed = time.time() - start_time
     logging.info(f"Query processed in {elapsed:.2f}s (Factual)")
-    
+
     return final_response
 
 if __name__ == "__main__":
