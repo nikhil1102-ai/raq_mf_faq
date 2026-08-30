@@ -3,6 +3,9 @@ import os
 import logging
 import traceback
 import threading
+import asyncio
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, Request, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +21,22 @@ from pipeline.qa_pipeline import answer
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
+
+# CORS configuration – allow all origins for local testing (restrict in prod)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    max_age=86400,
+)
+
+@app.get("/api/ping")
+async def ping():
+    return {"status": "ok"}
+
+
 
 
 # --- Auto-Ingest on Startup ---
@@ -106,10 +125,20 @@ def health():
     return {"status": "ok"}
 
 
+
+
+# Global thread pool for blocking operations (e.g., embedding + LLM calls)
+_executor = ThreadPoolExecutor(max_workers=4)
+
 @app.post("/api/ask")
-def ask(q: Query):
+async def ask(q: Query):
     try:
-        response = answer(q.query)
+        # Run the heavyweight pipeline in a thread pool to keep the event loop responsive
+        loop = asyncio.get_event_loop()
+        start = time.time()
+        response = await loop.run_in_executor(_executor, answer, q.query)
+        elapsed = time.time() - start
+        logging.info(f"Answer pipeline completed in {elapsed:.2f}s for query: '{q.query}'")
 
         # Ensure 'type' key is always present
         if "type" not in response:
@@ -117,9 +146,7 @@ def ask(q: Query):
                 response["type"] = "factual"
             elif "message" in response:
                 response["type"] = "advisory"
-
         return response
-
     except Exception as e:
         logging.error(f"Error processing query '{q.query}': {e}")
         logging.error(traceback.format_exc())
@@ -130,6 +157,7 @@ def ask(q: Query):
                 "message": "An internal error occurred while processing your request. Please try again."
             }
         )
+
 
 
 # --- Ingestion Trigger Endpoint ---
