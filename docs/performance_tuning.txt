@@ -295,12 +295,31 @@ AFTER:
   )
 
 WHY IT WORKS:
-  - Offloads the computationally expensive neural network inference (embedding)
-    from Railway's weak CPU to Jina AI's GPU servers.
-  - Achieves API response times of ~300-500ms instead of 13 seconds.
-  - Allowed us to remove heavy ML dependencies (sentence-transformers)
-    from requirements.txt, significantly speeding up builds and reducing image size.
-  - Required one-time re-ingestion since the model changed (384-dim -> 768-dim).
+  The Problem We Faced (Why it took 13+ seconds):
+  - When a user asks a question, the app must convert their text into a string of
+    numbers called an embedding vector. It uses this vector to mathematically
+    search ChromaDB for similar text chunks.
+  - Before the fix, we used `sentence-transformers` to run the neural network
+    locally on the server. Neural networks require thousands of complex matrix
+    multiplications to generate an embedding.
+  - Railway's Free Tier provides only a fraction of a basic CPU. Running that
+    heavy math on Railway's tiny CPU was like trying to render a 4K video on a
+    smartwatch. It took ~13 seconds just to process one sentence.
+
+  The Solution (Jina AI Embedding API):
+  Instead of changing *what* the app does, we changed *where* it does it.
+  1. Removed Local Processing: We deleted `sentence-transformers` from
+     requirements.txt. The Railway server no longer runs any neural network math.
+  2. Delegated to GPUs: When a query comes in, we now send the text via a quick
+     HTTP request to Jina AI's API.
+  3. Jina's Hardware: Jina AI processes the text instantly using massive,
+     enterprise-grade GPU servers, returning the embedding vector to us in
+     about 300 milliseconds.
+
+  In short: We took the heaviest, most computationally expensive task in the app
+  and outsourced it to a massive GPU server, dropping the processing time from
+  13 seconds down to a fraction of a second. This also required a one-time
+  re-ingestion since the model changed (384-dim -> 768-dim).
 
 
 ================================================================================
