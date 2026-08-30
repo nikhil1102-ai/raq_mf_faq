@@ -1,6 +1,6 @@
 # Implementation Plan: Mutual Fund FAQ Assistant (RAG-Based)
 
-> **Project:** RAG-MF_FAQ | **LLM:** Groq `qwen-3-32b` | **Vector DB:** ChromaDB | **Scheduler:** GitHub Actions Daily Cron
+> **Project:** RAG-MF_FAQ | **LLM:** Groq `openai/gpt-oss-20b` | **Vector DB:** ChromaDB | **Scheduler:** GitHub Actions Daily Cron (Option B)
 
 ---
 
@@ -665,4 +665,117 @@ Phase 6 (Integration & Testing)
 
 ---
 
-*Implementation Plan for RAG-MF_FAQ | Created: 2026-08-27 | Based on architecture.md & problemStatement.md | Phase 5 updated to use stitch_mutual_fund_faq_assistant/ HTML components*
+*Implementation Plan for RAG-MF_FAQ | Created: 2026-08-27 | Last Updated: 2026-08-30 | Based on architecture.md & problemStatement.md*
+
+---
+
+## Phase 7: Post-Launch Performance Optimisations (2026-08-30)
+
+### Objective
+Investigate and resolve 12–15s response latency and stale NAV data reported after go-live. Implement data freshness and scheduler fixes.
+
+### 7.1 — LLM Model Migration
+
+**File**: `pipeline/llm_client.py`
+
+| | Before | After |
+|---|---|---|
+| Model | `qwen/qwen3.8-27b` (deprecated Aug 16) | `openai/gpt-oss-20b` |
+| Sampling | `temperature=0.1, top_p=0.9` | `temperature=0.1` (top_p removed — redundant) |
+| Latency impact | ~8–10s LLM wait | ~1–2s LLM wait |
+
+```python
+# pipeline/llm_client.py
+response = client.chat.completions.create(
+    model="openai/gpt-oss-20b",   # or "openai/gpt-oss-120b" for higher quality
+    messages=messages,
+    temperature=0.1,
+    max_tokens=512,
+)
+```
+
+### 7.2 — ChromaDB Singleton Cache
+
+**File**: `retrieval/chroma_client.py`
+
+`chromadb.PersistentClient` was being instantiated on **every query**, reopening the SQLite connection each time. Fixed with module-level singleton caching (same pattern as `_model` in `query_embedder.py` and `_client` in `llm_client.py`).
+
+```python
+_client = None
+_collection = None
+
+def get_chroma_client():
+    global _client
+    if _client is None:
+        _client = chromadb.PersistentClient(path=persist_directory)
+    return _client
+```
+
+### 7.3 — Startup Warm-Up
+
+**File**: `ui/server.py`
+
+Added eager pre-loading of the `SentenceTransformer` embedding model and ChromaDB collection at server startup. Previously both were lazy-loaded on the first user request, contributing to first-request latency.
+
+```python
+@app.on_event("startup")
+def auto_ingest_if_empty():
+    # Eager warm-up
+    from retrieval.query_embedder import _get_model
+    _get_model()  # pre-loads all-MiniLM-L6-v2 into memory
+    from retrieval.chroma_client import get_collection
+    collection = get_collection()  # opens SQLite connection
+```
+
+### 7.4 — In-Memory Query Cache
+
+**File**: `pipeline/qa_pipeline.py`
+
+FAQ bots receive many repeated identical questions. Added a TTL-based in-memory dict cache that bypasses the full embed → retrieve → LLM pipeline for repeated queries.
+
+| Property | Value |
+|---|---|
+| TTL | 3600s (1 hour) |
+| Max entries | 128 (LRU eviction on oldest) |
+| Cache key | `" ".join(query.lower().split())` |
+| What's cached | Factual answers only |
+| Cached latency | < 5ms |
+
+### 7.5 — Stale Data Root Cause & Fix
+
+**File**: `ui/server.py`
+
+**Symptom**: NAV data showed Aug 26 values despite ingestion reporting success on Aug 30.  
+**Root Cause**: Both ingest call sites in `server.py` passed `--source processed`, which reads static `.txt` files committed in the repo (`data/processed/*.txt`). These files are one-time reference snapshots, not updated by the scraper.
+
+```diff
+# Both startup auto-ingest and /api/ingest/trigger endpoint
+- sys.argv = ["ingest.py", "--mode", "daily", "--source", "processed"]
++ sys.argv = ["ingest.py", "--mode", "daily", "--source", "web"]
+```
+
+> [!CAUTION]
+> Never use `--source processed` in production. The `.txt` files are static and will cause stale data in ChromaDB. Always use `--source web` so Railway scrapes live NAVs from Groww.
+
+### 7.6 — GitHub Actions: Option A → Option B
+
+**File**: `.github/workflows/daily_ingest.yml`
+
+The original Option A workflow ran ingestion inside GitHub Actions and uploaded ChromaDB as an artifact. This artifact was never synced to Railway's persistent volume — making the workflow useless for data freshness.
+
+Replaced with Option B: a lightweight job that calls `POST /api/ingest/trigger` on the live Railway instance, triggering a web scrape directly on the server where ChromaDB persists.
+
+### 7.7 — Ingest Endpoint Security
+
+**File**: `ui/server.py`
+
+- `/api/ingest/trigger`: hardened auth — now always requires `INGEST_API_KEY`; returns `503` if env var not set (previously skipped auth entirely if var was absent)
+- `GET /api/ingest/status`: new endpoint to check whether ingestion is currently running (used by GH Actions polling step)
+
+### Acceptance Criteria
+
+- [x] `/api/ask` responds in < 5s for warm requests
+- [x] NAV data reflects today's date after manual ingest trigger
+- [x] GitHub Actions Option B workflow triggers successfully
+- [x] `/api/ingest/trigger` returns 401 on wrong key, 503 if key not set
+- [x] Repeated queries return cache hit (< 5ms)

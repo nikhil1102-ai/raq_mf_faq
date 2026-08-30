@@ -1,7 +1,7 @@
 # Deployment Plan: Mutual Fund FAQ Assistant
 
 > **Frontend:** Vercel | **Backend:** Railway | **Scheduler:** GitHub Actions  
-> **Repository:** RAG-MF_FAQ | **Last Updated:** 2026-08-28
+> **Repository:** RAG-MF_FAQ | **Last Updated:** 2026-08-30
 
 ---
 
@@ -541,4 +541,82 @@ Follow this exact order to avoid circular dependency issues (CORS, URLs):
 
 ---
 
-*Deployment Plan for RAG-MF_FAQ | Created: 2026-08-28 | Platforms: Vercel + Railway + GitHub Actions*
+*Deployment Plan for RAG-MF_FAQ | Created: 2026-08-28 | Last Updated: 2026-08-30 | Platforms: Vercel + Railway + GitHub Actions*
+
+---
+
+## 9. Post-Deployment Changes & Optimisations (2026-08-30)
+
+### 9.1 — Performance Investigation & Fixes
+
+After go-live, response times of **12–15 seconds** were observed. Root-cause analysis identified four issues:
+
+| # | Root Cause | File | Fix Applied |
+|---|---|---|---|
+| 1 | **Heavy LLM model** — `qwen/qwen3.8-27b` (deprecated, slow) | `pipeline/llm_client.py` | Switched to `openai/gpt-oss-20b` (Groq's current fast model, ~500 tok/s) |
+| 2 | **ChromaDB reconnect on every request** — `PersistentClient` re-created per query | `retrieval/chroma_client.py` | Added module-level singleton cache |
+| 3 | **Embedding model cold-load on first request** — lazy load paid by first user | `ui/server.py` | Eager warm-up at startup (pre-loads `SentenceTransformer` + ChromaDB) |
+| 4 | **Railway cold starts** — container sleeps when idle | Infrastructure | UptimeRobot / GitHub Actions keep-alive ping on `/api/health` every 5 min |
+
+### 9.2 — Stale Data Fix
+
+**Problem**: Ingestion reported success but NAV data remained from 4 days prior (Aug 26).  
+**Root Cause**: Both the startup auto-ingest and the `/api/ingest/trigger` endpoint were calling `--source processed`, which reads pre-built `.txt` files committed in the repo. These files are static snapshots and do not update automatically.  
+**Fix**: Changed both ingest calls in `ui/server.py` to `--source web` so Railway scrapes live data from Groww on every ingest run.
+
+```diff
+# ui/server.py — startup auto-ingest
+- sys.argv = ["ingest.py", "--mode", "full", "--source", "processed"]
++ sys.argv = ["ingest.py", "--mode", "full", "--source", "web"]
+
+# ui/server.py — /api/ingest/trigger endpoint
+- sys.argv = ["ingest.py", "--mode", "daily", "--source", "processed"]
++ sys.argv = ["ingest.py", "--mode", "daily", "--source", "web"]
+```
+
+> [!IMPORTANT]
+> The `data/processed/*.txt` files in the repository are **static reference snapshots only** and must not be used as the live data source in production. Always use `--source web` on Railway.
+
+### 9.3 — Query Cache Added
+
+Added an in-memory LRU cache in `pipeline/qa_pipeline.py` to short-circuit repeated queries:
+- **TTL**: 1 hour
+- **Max entries**: 128
+- **Cache key**: normalized (lowercased + whitespace-stripped) query string
+- **Cached**: successful factual answers only (advisory/personal/statement responses are static strings with no LLM cost)
+- **Effect**: repeated identical queries return in **< 5ms** instead of 2–3s
+
+### 9.4 — GitHub Actions Scheduler: Option A → Option B
+
+Replaced the GitHub-hosted ingestion workflow (Option A) with a Railway-trigger workflow (Option B).
+
+**Why**: Option A ran ingestion inside the GitHub Actions runner and uploaded ChromaDB as an artifact. This artifact was never synced back to Railway's persistent volume, so Railway continued serving stale data.
+
+**Option B flow**:
+```
+GitHub Actions (cron 10:00 UTC)
+    → POST /api/ingest/trigger  (Bearer INGEST_API_KEY)
+        → Railway starts web scrape + re-embed + upsert into ChromaDB volume
+            → data persists across restarts/redeployments
+```
+
+**Required secrets**:
+| Location | Secret | Value |
+|---|---|---|
+| GitHub Secrets | `INGEST_API_KEY` | Strong random token |
+| GitHub Secrets | `RAILWAY_URL` | `https://your-app.up.railway.app` |
+| Railway Variables | `INGEST_API_KEY` | Same token as above |
+
+### 9.5 — Endpoint Security Hardening
+
+`/api/ingest/trigger` previously allowed unauthenticated access when `INGEST_API_KEY` env var was not set. Fixed to always return `503` if the key is not configured, and `401` if the wrong key is provided.
+
+New endpoint added: `GET /api/ingest/status` — returns `{"status": "running"|"idle"}` (also protected by `INGEST_API_KEY`). Used by the GitHub Actions poller to confirm ingestion completion.
+
+### 9.6 — Commits
+
+| Commit | Description |
+|---|---|
+| `3b5d4fd` | perf: gpt-oss-20b model, query cache, hardened ingest auth, Option B GH Actions workflow |
+| `fafd362` | fix: stale NAV data (switch ingest to --source web) + gpt-oss-20b model (was never committed) |
+
