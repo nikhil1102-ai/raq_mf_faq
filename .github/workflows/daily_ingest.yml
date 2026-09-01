@@ -2,7 +2,7 @@ name: Daily Corpus Refresh (Option B — Railway Trigger)
 
 on:
   schedule:
-    - cron: "0 10 * * *"   # 10:00 UTC daily (3:30 PM IST)
+    - cron: "30 4 * * *"   # 10:00 UTC daily (3:30 PM IST)
   workflow_dispatch:        # Manual trigger from GitHub UI
 
 jobs:
